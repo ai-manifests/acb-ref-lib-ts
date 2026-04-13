@@ -291,6 +291,48 @@ describe('ACB PR Merge Budget', () => {
     expect(store.getSettlementForDeliberation(DLB)).not.toBeNull();
   });
 
+  it('empty bonus pools distribute equally — draw arithmetic still closes (cheap routine, no outcome, no load-bearing, no falsifications)', () => {
+    // Three participants, no acknowledged falsifications, none load-bearing,
+    // no outcome data. Three of the four bonus categories have no eligible
+    // recipients and would silently lose 75% of the draw without the
+    // empty-pool rule (spec §6.2).
+    const budget = makeBudget();
+    const drawTotal = 150;
+
+    const contributions: ParticipantContribution[] = [
+      { agentId: TEST_RUNNER, participated: true, acknowledgedFalsifications: 0, loadBearing: false, outcomeBrierDelta: null, dissentQualityFlagged: false },
+      { agentId: SCANNER, participated: true, acknowledgedFalsifications: 0, loadBearing: false, outcomeBrierDelta: null, dissentQualityFlagged: false },
+      { agentId: LINTER, participated: true, acknowledgedFalsifications: 0, loadBearing: false, outcomeBrierDelta: null, dissentQualityFlagged: false },
+    ];
+
+    const record = buildSettlementRecord({
+      entryId: 'adj_test_empty_pool',
+      deliberationId: DLB,
+      timestamp: '2026-04-14T09:30:00.000Z',
+      priorEntryHash: null,
+      budgetId: BGT,
+      amountTotal: budget.amountTotal,
+      drawTotal,
+      settlement: budget.settlement,
+      contributions,
+      substrateReports: [],
+      habitDiscountApplied: 0,
+      unlockTriggered: false,
+      disagreementMagnitudeInitial: 0.05,
+      outcomeReferenced: null,
+      signature: 'ed25519:test',
+    });
+
+    // Distributions sum to drawTotal — no money lost
+    const epiSum = record.epistemicDistributions.reduce((s, d) => s + d.amount, 0);
+    const subSum = record.substrateDistributions.reduce((s, d) => s + d.amount, 0);
+    expect(Math.abs(subSum + epiSum - drawTotal)).toBeLessThan(0.5);
+
+    // Each participant gets the same share when no contribution dimensions distinguish them
+    const amounts = record.epistemicDistributions.map((d) => d.amount);
+    expect(Math.max(...amounts) - Math.min(...amounts)).toBeLessThan(0.5);
+  });
+
   it('cancellation locks the budget out of settlement', () => {
     const store = new InMemoryBudgetStore();
     store.append({

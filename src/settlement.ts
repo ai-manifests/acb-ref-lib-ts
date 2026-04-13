@@ -57,27 +57,38 @@ export function distributeEpistemic(
   if (participants.length === 0) return [];
 
   const perBonus = pool / 4;
+  const equalShare = perBonus / participants.length;
 
   // Base share — equal across all participants
-  const baseShare = perBonus / participants.length;
+  const baseShare = equalShare;
 
-  // Falsification bonus — proportional to acknowledged falsifications
+  // Falsification bonus — proportional to acknowledged falsifications.
+  // If nobody acknowledged any falsification, the pool distributes equally
+  // so its share is not lost (preserves the "100% of epistemic pool" intent).
   const totalFalsifications = participants.reduce((s, c) => s + c.acknowledgedFalsifications, 0);
   const falsificationFor = (c: ParticipantContribution): number =>
-    totalFalsifications === 0 ? 0 : (perBonus * c.acknowledgedFalsifications) / totalFalsifications;
+    totalFalsifications === 0
+      ? equalShare
+      : (perBonus * c.acknowledgedFalsifications) / totalFalsifications;
 
-  // Load-bearing bonus — equal across load-bearing agents
+  // Load-bearing bonus — equal across load-bearing agents. If nobody is
+  // load-bearing (unanimous, or no single agent's removal would change
+  // the outcome), the pool distributes equally across all participants.
   const loadBearingCount = participants.filter((c) => c.loadBearing).length;
-  const loadBearingFor = (c: ParticipantContribution): number =>
-    loadBearingCount === 0 ? 0 : c.loadBearing ? perBonus / loadBearingCount : 0;
+  const loadBearingFor = (c: ParticipantContribution): number => {
+    if (loadBearingCount === 0) return equalShare;
+    return c.loadBearing ? perBonus / loadBearingCount : 0;
+  };
 
-  // Outcome correctness bonus — inverse Brier delta, normalized
+  // Outcome correctness bonus — inverse Brier delta, normalized. If no
+  // outcomes are reported (immediate-mode settlement), the pool
+  // distributes equally.
   const withOutcomes = participants.filter((c) => c.outcomeBrierDelta != null);
   const inverseDeltas = withOutcomes.map((c) => 1 - (c.outcomeBrierDelta ?? 0));
   const totalInverse = inverseDeltas.reduce((s, v) => s + v, 0);
   const outcomeFor = (c: ParticipantContribution): number => {
+    if (withOutcomes.length === 0 || totalInverse === 0) return equalShare;
     if (c.outcomeBrierDelta == null) return 0;
-    if (totalInverse === 0) return 0;
     return (perBonus * (1 - c.outcomeBrierDelta)) / totalInverse;
   };
 
