@@ -9,7 +9,7 @@ Zero runtime dependencies. Pure TypeScript, ESM.
 ## Install
 
 ```bash
-npm install acb-manifest
+npm install @ai-manifests/acb-manifest
 ```
 
 ## Quick example
@@ -25,7 +25,7 @@ import {
   TerminationState,
   type BudgetCommitted,
   type Tally,
-} from 'acb-manifest';
+} from '@ai-manifests/acb-manifest';
 
 const initialTally: Tally = { approveWeight: 0.71, rejectWeight: 0.64, abstainWeight: 0.18 };
 const magnitude = computeDisagreementMagnitude(initialTally);  // ≈ 0.948 (contested)
