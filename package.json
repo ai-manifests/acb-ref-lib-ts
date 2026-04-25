@@ -2,7 +2,7 @@
   "name": "@ai-manifests/acb-manifest",
   "version": "0.3.0",
   "description": "TypeScript reference implementation of the Agent Cognitive Budget Protocol (ACB)",
-  "author": "David H. Friedel Jr. — MarketAlly",
+  "author": "David H. Friedel Jr. — MarketAlly Pte Ltd",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
