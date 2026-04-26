@@ -1,5 +1,11 @@
 # acb-manifest
 
+[![npm](https://img.shields.io/npm/v/@ai-manifests/acb-manifest.svg?label=npm)](https://www.npmjs.com/package/@ai-manifests/acb-manifest)
+[![Downloads](https://img.shields.io/npm/dm/@ai-manifests/acb-manifest.svg)](https://www.npmjs.com/package/@ai-manifests/acb-manifest)
+[![Node](https://img.shields.io/badge/node-20%2B-blue.svg)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Spec](https://img.shields.io/badge/spec-acb--manifest.dev-informational)](https://acb-manifest.dev)
+
 A TypeScript reference implementation of the **Agent Cognitive Budget (ACB)** protocol — the metabolic-budget layer for deliberative multi-agent systems. ACB provides append-only journal entries, pricing models, habit-memory discounts, and settlement distribution that mirror the brain's resource allocation for routine vs. contested decisions.
 
 This library is one of several reference implementations ([C#](https://github.com/ai-manifests/acb-ref-lib-csharp), [Python](https://github.com/ai-manifests/acb-ref-lib-py)) of the same spec. The spec itself is at [adp-manifest.dev](https://adp-manifest.dev) and is the source of truth; this library implements what the spec says.
